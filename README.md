@@ -1,6 +1,9 @@
-This is a custom chess engine developed using the Sebastian Lague Chess Challenge API(https://github.com/SebLague/Chess-Challenge).  
+This is a custom chess engine developed using the Sebastian Lague Chess Challenge API
 
-    It leverages advanced techniques to play efficiently and intelligently:
+        https://github.com/SebLague/Chess-Challenge  
+
+
+It leverages advanced techniques to play efficiently and intelligently:
 
 
 
