@@ -3,83 +3,102 @@ using System;
 using System.Collections.Generic;
 
 public class MyBot : IChessBot
+{// Pawn Table: Encourage central pawns and penalize early advancement of edge pawns.
+static int[] PawnTable = new int[]
 {
-    static int[] PawnTable = new int[]
-       {
-        50, 50, 50, 50, 50, 50, 50, 50,
-        55, 60, 60, 30, 30, 60, 60, 55,
-        55, 45, 40, 50, 50, 40, 45, 55,
-        50, 50, 50, 70, 70, 50, 50, 50,
-        55, 55, 60, 105, 105, 60, 55, 55,
-        60, 60, 70, 80, 80, 70, 60, 60,
-        100, 100, 100, 100, 100, 100, 100, 100,
-        50, 50, 50, 50, 50, 50, 50, 50
-       };
+    0,   0,   0,   0,   0,   0,   0,   0,
+    5,  10,  10, -20, -20,  10,  10,   5,
+    5,  -5, -10,   0,   0, -10,  -5,   5,
+    0,   0,   0,  20,  20,   0,   0,   0,
+    5,   5,  10,  25,  25,  10,   5,   5,
+   10,  10,  20,  30,  30,  20,  10,  10,
+   50,  50,  50,  50,  50,  50,  50,  50,
+    0,   0,   0,   0,   0,   0,   0,   0
+};
 
-    static int[] KnightTable = new int[]
-    {
-        0, 10, 20, 20, 20, 20, 10, 0,
-        10, 30, 50, 50, 50, 50, 30, 10,
-        20, 50, 60, 65, 65, 60, 50, 20,
-        20, 55, 65, 70, 70, 65, 55, 20,
-        20, 50, 65, 70, 70, 65, 50, 20,
-        20, 55, 60, 65, 65, 60, 55, 20,
-        10, 30, 50, 55, 55, 50, 30, 10,
-        0, 10, 20, 20, 20, 20, 10, 0
-    };
+// Knight Table: Encourage centralization and penalize edge positions.
+static int[] KnightTable = new int[]
+{
+    -50, -40, -30, -30, -30, -30, -40, -50,
+    -40, -20,   0,   0,   0,   0, -20, -40,
+    -30,   0,  10,  15,  15,  10,   0, -30,
+    -30,   5,  15,  20,  20,  15,   5, -30,
+    -30,   0,  15,  20,  20,  15,   0, -30,
+    -30,   5,  10,  15,  15,  10,   5, -30,
+    -40, -20,   0,   5,   5,   0, -20, -40,
+    -50, -40, -30, -30, -30, -30, -40, -50
+};
 
-    static int[] BishopTable = new int[]
-    {
-        30, 40, 40, 40, 40, 40, 40, 30,
-        40, 50, 50, 50, 50, 50, 50, 40,
-        40, 50, 55, 60, 60, 55, 50, 40,
-        40, 55, 55, 60, 60, 55, 55, 40,
-        40, 50, 60, 60, 60, 60, 50, 40,
-        40, 60, 60, 60, 60, 60, 60, 40,
-        40, 55, 50, 50, 50, 50, 55, 40,
-        30, 40, 40, 40, 40, 40, 40, 30
-    };
+// Bishop Table: Encourage activity and central positioning.
+static int[] BishopTable = new int[]
+{
+    -20, -10, -10, -10, -10, -10, -10, -20,
+    -10,   5,   0,   0,   0,   0,   5, -10,
+    -10,  10,  10,  10,  10,  10,  10, -10,
+    -10,   0,  10,  10,  10,  10,   0, -10,
+    -10,   5,   5,  10,  10,   5,   5, -10,
+    -10,   0,   5,  10,  10,   5,   0, -10,
+    -10,   0,   0,   0,   0,   0,   0, -10,
+    -20, -10, -10, -10, -10, -10, -10, -20
+};
 
-    static int[] RookTable = new int[]
-    {
-        50, 50, 50, 55, 55, 50, 50, 50,
-        45, 50, 50, 50, 50, 50, 50, 45,
-        45, 50, 50, 50, 50, 50, 50, 45,
-        45, 50, 50, 50, 50, 50, 50, 45,
-        45, 50, 50, 50, 50, 50, 50, 45,
-        45, 50, 50, 50, 50, 50, 50, 45,
-        55, 60, 60, 60, 60, 60, 60, 55,
-        50, 50, 50, 55, 55, 50, 50, 50
-    };
+// Rook Table: Favor open files and 7th rank activity.
+static int[] RookTable = new int[]
+{
+     0,   0,   5,  10,  10,   5,   0,   0,
+    -5,   0,   0,   0,   0,   0,   0,  -5,
+    -5,   0,   0,   0,   0,   0,   0,  -5,
+    -5,   0,   0,   0,   0,   0,   0,  -5,
+    -5,   0,   0,   0,   0,   0,   0,  -5,
+    -5,   0,   0,   0,   0,   0,   0,  -5,
+     5,  10,  10,  10,  10,  10,  10,   5,
+     0,   0,   5,  10,  10,   5,   0,   0
+};
 
-    static int[] QueenTable = new int[]
-    {
-        30, 40, 40, 45, 45, 40, 40, 30,
-        40, 50, 50, 50, 50, 50, 50, 40,
-        40, 50, 55, 55, 55, 55, 50, 40,
-        45, 50, 55, 55, 55, 55, 50, 45,
-        50, 50, 55, 55, 55, 55, 50, 45,
-        40, 55, 55, 55, 55, 55, 50, 40,
-        40, 50, 50, 50, 50, 50, 50, 40,
-        30, 40, 40, 45, 45, 40, 40, 30
-    };
+// Queen Table: Maximize mobility and central control.
+static int[] QueenTable = new int[]
+{
+    -20, -10, -10,  -5,  -5, -10, -10, -20,
+    -10,   0,   5,   0,   0,   0,   0, -10,
+    -10,   5,   5,   5,   5,   5,   0, -10,
+     -5,   0,   5,   5,   5,   5,   0,  -5,
+      0,   0,   5,   5,   5,   5,   0,  -5,
+    -10,   0,   5,   5,   5,   0,   0, -10,
+    -10,   0,   0,   0,   0,   0,   0, -10,
+    -20, -10, -10,  -5,  -5, -10, -10, -20
+};
 
-    static int[] KingTableMiddleGame = new int[]
-    {
-        20, 10, 10, 0, 0, 10, 10, 20,
-        20, 10, 10, 0, 0, 10, 10, 20,
-        20, 10, 10, 0, 0, 10, 10, 20,
-        20, 10, 10, 0, 0, 10, 10, 20,
-        30, 20, 20, 10, 10, 20, 20, 30,
-        40, 30, 30, 30, 30, 30, 30, 40,
-        70, 70, 50, 50, 50, 50, 70, 70,
-        70, 80, 60, 50, 50, 60, 80, 70
-    };
+// King Table (Middle Game): Encourage safety, reward castling.
+static int[] KingTableMiddleGame = new int[]
+{
+    -30, -40, -40, -50, -50, -40, -40, -30,
+    -30, -40, -40, -50, -50, -40, -40, -30,
+    -30, -40, -40, -50, -50, -40, -40, -30,
+    -30, -40, -40, -50, -50, -40, -40, -30,
+    -20, -30, -30, -40, -40, -30, -30, -20,
+    -10, -20, -20, -20, -20, -20, -20, -10,
+     20,  20,   0,   0,   0,   0,  20,  20,
+     20,  30,  10,   0,   0,  10,  30,  20
+};
+
+// King Table (Endgame): Favor centralization and activity.
+static int[] KingTableEndgame = new int[]
+{
+    -50, -30, -30, -30, -30, -30, -30, -50,
+    -30, -20, -20, -20, -20, -20, -20, -30,
+    -30, -20,  20,  30,  30,  20, -20, -30,
+    -30, -20,  30,  40,  40,  30, -20, -30,
+    -30, -20,  30,  40,  40,  30, -20, -30,
+    -30, -20,  20,  30,  30,  20, -20, -30,
+    -30, -30, -20, -20, -20, -20, -30, -30,
+    -50, -30, -30, -30, -30, -30, -30, -50
+};
+
 
 
     public Move Think(Board board, Timer timer)
     {
-        int depth = 2;
+        int depth = 4;
         Move move = Negamax(board, depth, int.MinValue, int.MaxValue, 1);
         return move;
     }
@@ -89,15 +108,19 @@ public class MyBot : IChessBot
         int score = 0;
         bool isBotWhite = board.IsWhiteToMove;
 
-        foreach (var pieceList in board.GetAllPieceLists())
+       
+
+       foreach (var pieceList in board.GetAllPieceLists())
         {
             foreach (var piece in pieceList)
             {
                 int pieceValue = GetPieceValues(piece);
-                int positionValue = GetPositionalValue(piece, isBotWhite);
+                int positionValue = GetPositionalValue(piece);
                 score += (piece.IsWhite == isBotWhite ? 1 : -1) * (pieceValue + positionValue);
+                
             }
         }
+
 
         if (board.IsInCheck())
         {
@@ -127,7 +150,7 @@ public class MyBot : IChessBot
         }
     }
 
-    public int GetPositionalValue(Piece piece, bool isBotWhite)
+    public int GetPositionalValue(Piece piece)
     {
         int[] table;
         switch (piece.PieceType)
@@ -148,7 +171,7 @@ public class MyBot : IChessBot
                 table = QueenTable;
                 break;
             case PieceType.King:
-                table = KingTableMiddleGame;
+            table =  KingTableMiddleGame;
                 break;
             default:
                 return 0;

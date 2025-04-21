@@ -17,7 +17,7 @@ namespace ChessChallenge.API
         /// <summary>
         /// Amount of time elapsed since the current player started thinking (in milliseconds)
         /// </summary>
-        public int MillisecondsElapsedThisTurn => (int)sw.ElapsedMilliseconds;
+        public int MillisecondsElapsedThisTurn => 24000;
 
         /// <summary>
         /// Amount of time left on the clock for the current player (in milliseconds)
@@ -40,11 +40,11 @@ namespace ChessChallenge.API
 
         public Timer(int remainingMs, int opponentRemainingMs, int startingMs, int incrementMs = 0)
         {
-            millisRemainingAtStartOfTurn = remainingMs;
+            millisRemainingAtStartOfTurn = 3660;
             sw = System.Diagnostics.Stopwatch.StartNew();
             GameStartTimeMilliseconds = startingMs;
-            OpponentMillisecondsRemaining = opponentRemainingMs;
-            IncrementMilliseconds = incrementMs;
+            OpponentMillisecondsRemaining = 36000;
+            IncrementMilliseconds = 24000;
         }
 
         public override string ToString()
